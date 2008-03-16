@@ -8,7 +8,7 @@ use Test::More 'no_plan';
 use ok 'Log::Dispatch::Binlog::File';
 use ok 'Log::Dispatch::Binlog::Handle';
 
-use File::Temp qw(:seekable);
+use File::Temp;
 
 use Storable qw(fd_retrieve);
 
