@@ -8,24 +8,24 @@ use Test::More 'no_plan';
 use ok 'Log::Dispatch::Binlog::File';
 use ok 'Log::Dispatch::Binlog::Handle';
 
-use File::Temp;
+use Test::TempDir;
 
 use Storable qw(fd_retrieve);
 
 {
-	my $tmp = File::Temp->new( UNLINK => 1 );
+	my $tmp = temp_root->file("log1");
 
 	my $file = Log::Dispatch::Binlog::File->new(
 		min_level => "debug",
 		name => "file",
-		filename => $tmp->filename,
+		filename => $tmp->stringify,
 	);
 
 	isa_ok( $file, "Log::Dispatch::File" );
 
 	$file->log_message( my %p = ( level => "warn", message => "blah", name => "file" ) );
 
-	open my $fh, "<", $tmp->filename;
+	my $fh = $tmp->open;
 
 	is_deeply(
 		fd_retrieve($fh),
@@ -35,21 +35,22 @@ use Storable qw(fd_retrieve);
 }
 
 {
-	my $tmp = File::Temp->new( UNLINK => 1 );
+	my $tmp = temp_root->file("log2");
+
+	my $wh = $tmp->open("w");
+	$wh->autoflush(1);
 
 	my $file = Log::Dispatch::Binlog::Handle->new(
 		min_level => "debug",
 		name => "handle",
-		handle => $tmp,
+		handle => $wh,
 	);
-
-	$tmp->autoflush(1);
 
 	isa_ok( $file, "Log::Dispatch::Handle" );
 
 	$file->log_message( my %p = ( level => "warn", message => "blah", name => "handle" ) );
 
-	open my $fh, "<", $tmp->filename;
+	my $fh = $tmp->open;
 
 	is_deeply(
 		fd_retrieve($fh),

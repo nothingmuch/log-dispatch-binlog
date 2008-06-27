@@ -15,7 +15,7 @@ WriteMakefile(
 		'Log::Dispatch::File' => 0,
 		'Log::Dispatch::Handle' => 0,
 		'Storable' => 0,
-		'File::Temp' => 0,
+		'Test::TempDir' => 0,
 	},
 );
 
